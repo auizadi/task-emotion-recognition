@@ -71,6 +71,4 @@ if enable_camera:
             cap.release()
             st.stop()  # Hentikan Streamlit dari melanjutkan proses
 
-    # # Lepaskan webcam setelah loop selesai
-    # cap.release()
-    # cv2.destroyAllWindows()
+  
