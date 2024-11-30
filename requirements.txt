@@ -1,7 +1,7 @@
 streamlit
 mtcnn
 matplotlib
-opencv-python-headless
+opencv-python
 numpy
 tensorflow
 keras

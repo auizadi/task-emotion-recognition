@@ -65,6 +65,12 @@ if enable_camera:
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         stframe.image(frame_rgb, channels="RGB")
 
-    # Lepaskan webcam setelah loop selesai
-    cap.release()
-    cv2.destroyAllWindows()
+        # Tambahkan tombol untuk keluar dari kamera
+        stop_camera = st.button("Matikan Kamera")
+        if stop_camera:
+            cap.release()
+            st.stop()  # Hentikan Streamlit dari melanjutkan proses
+
+    # # Lepaskan webcam setelah loop selesai
+    # cap.release()
+    # cv2.destroyAllWindows()
