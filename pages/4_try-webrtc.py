@@ -1,5 +1,5 @@
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer
+from streamlit_webrtc import webrtc_streamer, RTCConfiguration
 import av
 
 def video_frame_callback(frame):
@@ -11,7 +11,7 @@ webrtc_streamer(
     key="example",
     video_frame_callback=video_frame_callback,
     media_stream_constraints={"video": True, "audio": False},
-    rtc_configuration={  
+    rtc_configuration=RTCConfiguration({  
         "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-    }
+    })
 )
