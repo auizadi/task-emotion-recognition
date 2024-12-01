@@ -3,7 +3,7 @@ mtcnn
 matplotlib
 opencv-python
 numpy
-tensorflow==2.18.0
+tensorflow
 keras
 streamlit-webrtc
 deepface
