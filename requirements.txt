@@ -6,3 +6,5 @@ numpy
 tensorflow
 keras
 streamlit-webrtc
+deepface
+opencv-python-headless 
