@@ -8,3 +8,4 @@ keras
 streamlit-webrtc
 deepface
 av
+retina-face
