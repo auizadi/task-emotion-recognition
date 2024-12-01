@@ -2,7 +2,7 @@ import streamlit as st
 import cv2  
 from deepface import DeepFace   
 import numpy as np  
-from PIL import Image  # Import PIL for image processing  
+
 
 st.title("Deteksi Emosi Menggunakan DeepFace")  
 
