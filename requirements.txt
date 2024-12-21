@@ -2,9 +2,9 @@ streamlit
 mtcnn
 matplotlib
 opencv-python
-numpy==1.23.5
-tensorflow>=1.9.0
-keras>=2.2.0
+numpy
+tensorflow
+keras
 streamlit-webrtc
 deepface
 av
