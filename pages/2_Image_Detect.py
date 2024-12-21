@@ -1,17 +1,17 @@
 import streamlit as st
 from mtcnn import MTCNN
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 from keras.models import load_model
 
-st.sidebar.subheader("deteksi")
 st.title("Pengenalan Emosi dengan Foto")
+st.sidebar.caption("Emotion recognition and face detection using MTCNN")
 uploaded_file = st.file_uploader("Pilih foto dari penyimpanan perangkat Anda.", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
     # Load model
-    model = load_model('model.h5')
+    model = load_model('deepid_60.keras')
 
     # Label emosi
     emotion_labels = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
@@ -42,7 +42,7 @@ if uploaded_file is not None:
         face_region = image_rgb[y:y2, x:x2]
 
         # Resize the face region to match the input shape of the model (e.g., 48x48 or 64x64)
-        face_region_resized = cv2.resize(face_region, (48, 48))  # Adjust size as per your model
+        face_region_resized = cv2.resize(face_region, (39, 31))  # Adjust size as per your model
         face_region_gray = cv2.cvtColor(face_region_resized, cv2.COLOR_RGB2GRAY)
         face_region_normalized = face_region_gray / 255.0  # Normalize pixel values
         face_region_input = np.expand_dims(face_region_normalized, axis=0)
@@ -56,6 +56,14 @@ if uploaded_file is not None:
         # Draw the bounding box and label on the image
         cv2.rectangle(image_with_results, (x, y), (x2, y2), (0, 255, 0), 2)
         cv2.putText(image_with_results, emotion_label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 2.0, (0, 255, 0), 3)
+
+        # landmark
+        keypoints = face['keypoints']
+        cv2.circle(image_with_results,(keypoints['left_eye']), 4, (0, 255, 0), -1)
+        cv2.circle(image_with_results,(keypoints['right_eye']), 4, (0, 255, 0), -1)
+        cv2.circle(image_with_results,(keypoints['nose']), 4, (0, 255, 0), -1)
+        cv2.circle(image_with_results,(keypoints['mouth_left']), 4, (0, 255, 0), -1)
+        cv2.circle(image_with_results,(keypoints['mouth_right']), 4, (0, 255, 0), -1)
 
     # Display the results
     st.image(image_with_results, use_container_width=True)

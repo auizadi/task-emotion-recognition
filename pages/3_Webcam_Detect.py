@@ -5,10 +5,11 @@ import numpy as np
 from tensorflow.keras.models import load_model
 
 # Judul aplikasi
-st.title("Real-Time Emotion Detection")
+st.title("Real-Time Emotion Recognition")
+st.sidebar.caption("Real-time emotion recognition and face detection using MTCNN")
 
 # Load model dan label emosi
-model = load_model('model.h5')
+model = load_model('model_file.keras')
 emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
 
 # Inisialisasi MTCNN
@@ -42,6 +43,7 @@ if enable_camera:
         if result:
             for person in result:
                 bounding_box = person['box']
+                keypoints = person['keypoints']
 
                 x, y, width, height = bounding_box
                 x, y = max(0, x), max(0, y)
@@ -58,6 +60,13 @@ if enable_camera:
                     # Menampilkan label emosi di atas kotak bounding
                     cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
                     cv2.putText(frame, emotion, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+
+                    # Menampilkan keypoints
+                    cv2.circle(frame, keypoints['left_eye'], 4, (0, 255, 0), -1)
+                    cv2.circle(frame, keypoints['right_eye'], 4, (0, 255, 0), -1)
+                    cv2.circle(frame, keypoints['nose'], 4, (0, 255, 0), -1)
+                    cv2.circle(frame, keypoints['mouth_left'], 4, (0, 255, 0), -1)
+                    cv2.circle(frame, keypoints['mouth_right'], 4, (0, 255, 0), -1)
                 except Exception as e:
                     print(f"Error processing face: {e}")
 

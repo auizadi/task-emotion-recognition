@@ -4,8 +4,8 @@ from deepface import DeepFace
 import numpy as np  
 
 
-st.title("Deteksi Emosi Menggunakan DeepFace")  
-
+st.title("Pengenalan Emosi Menggunakan DeepFace")  
+st.sidebar.caption("Emotion recognition using Deepface")
 # Upload a single image file  
 upload = st.file_uploader(label='Upload foto', type=['png', 'jpg', 'jpeg'])  
 
