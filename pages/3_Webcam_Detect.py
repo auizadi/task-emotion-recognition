@@ -9,14 +9,14 @@ st.title("Real-Time Emotion Recognition")
 st.sidebar.caption("Real-time emotion recognition and face detection using MTCNN")
 
 # Load model dan label emosi
-model = load_model('model_file.keras')
+model = load_model('deepid_60.keras')
 emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
 
 # Inisialisasi MTCNN
 detector = MTCNN()
 
 # Fungsi untuk memproses wajah
-def preprocess_face(face, target_size=(48, 48)):
+def preprocess_face(face, target_size=(39, 31)):
     face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
     face = cv2.resize(face, target_size)
     face = face / 255.0

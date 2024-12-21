@@ -3,7 +3,7 @@ from mtcnn import MTCNN
 # import matplotlib.pyplot as plt
 import cv2
 import numpy as np
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 
 st.title("Pengenalan Emosi dengan Foto")
 st.sidebar.caption("Emotion recognition and face detection using MTCNN")
