@@ -1,79 +1,81 @@
 import streamlit as st
-import cv2
-from mtcnn.mtcnn import MTCNN
 import numpy as np
-from tensorflow.keras.models import load_model
+import tensorflow as tf
+import cv2
+from PIL import Image, ImageDraw
+from mtcnn import MTCNN
 
-# Judul aplikasi
-st.title("Real-Time Emotion Recognition")
-st.sidebar.caption("Real-time emotion recognition and face detection using MTCNN")
+# Load pre-trained model
+@st.cache_resource
+def load_model():
+    model = tf.keras.models.load_model("best_model_fer2013.keras")  # Replace with your model file path
+    return model
 
-# Load model dan label emosi
-model = load_model('deepid_60.keras')
-emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+# Define emotion labels
+class_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Neutral', 'Sad', 'Surprise']
 
-# Inisialisasi MTCNN
-detector = MTCNN()
+# Preprocess the image to match model input
+def preprocess_image(image):
+    image = cv2.resize(image, ( 47,55))  # Resize to the target size
+    image = image / 255.0  # Normalize pixel values
+    if image.shape[-1] == 1:  # If grayscale, convert to RGB
+        image = np.repeat(image, 3, axis=-1)
+    image = np.expand_dims(image, axis=0)  # Add batch dimension
+    return image
 
-# Fungsi untuk memproses wajah
-def preprocess_face(face, target_size=(39, 31)):
-    face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
-    face = cv2.resize(face, target_size)
-    face = face / 255.0
-    face = np.expand_dims(face, axis=-1)
-    face = np.expand_dims(face, axis=0)
-    return face
+# Real-time emotion detection function
+def real_time_emotion_detection():
+    st.title("Real-Time Emotion Detection")
 
-# Opsi untuk menggunakan webcam
-enable_camera = st.checkbox("Aktifkan Kamera")
+    # Initialize webcam
+    st.write("Starting webcam...")
+    run = st.checkbox("Run Webcam")
+    
+    if run:
+        # Load model
+        model = load_model()
+        mtcnn = MTCNN()
 
-if enable_camera:
-    # Menggunakan OpenCV untuk akses webcam
-    cap = cv2.VideoCapture(0)
-    stframe = st.empty()
+                # Start video capture
+        cap = cv2.VideoCapture(0)
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            st.warning("Tidak dapat mengakses kamera.")
-            break
+        # Create a placeholder for the video frame
+        frame_placeholder = st.empty()
 
-        # Deteksi wajah menggunakan MTCNN
-        result = detector.detect_faces(frame)
-        if result:
-            for person in result:
-                bounding_box = person['box']
-                keypoints = person['keypoints']
+        while run:
+            ret, frame = cap.read()
+            if not ret:
+                st.warning("Failed to capture video. Please check your webcam.")
+                break
 
-                x, y, width, height = bounding_box
-                x, y = max(0, x), max(0, y)
+            # Convert frame to RGB
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-                face = frame[y:y+height, x:x+width]
+            # Detect faces using MTCNN
+            detections = mtcnn.detect_faces(rgb_frame)
 
-                try:
-                    # Preprocessing wajah
-                    preprocessed_face = preprocess_face(face)
-                    prediction = model.predict(preprocessed_face)
-                    emotion_index = np.argmax(prediction)
-                    emotion = emotion_labels[emotion_index]
+            # Draw bounding boxes and predict emotion
+            for detection in detections:
+                x, y, width, height = detection['box']
+                face = rgb_frame[max(0, y):y + height, max(0, x):x + width]  # Ensure indices are valid
 
-                    # Menampilkan label emosi di atas kotak bounding
+                # Preprocess the detected face
+                if face.size > 0:
+                    processed_face = preprocess_image(face)
+                    predictions = model.predict(processed_face)
+                    predicted_label = class_labels[np.argmax(predictions)]
+
+                    # Draw bounding box and label
                     cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
-                    cv2.putText(frame, emotion, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+                    cv2.putText(frame, predicted_label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
-                    # Menampilkan keypoints
-                    cv2.circle(frame, keypoints['left_eye'], 4, (0, 255, 0), -1)
-                    cv2.circle(frame, keypoints['right_eye'], 4, (0, 255, 0), -1)
-                    cv2.circle(frame, keypoints['nose'], 4, (0, 255, 0), -1)
-                    cv2.circle(frame, keypoints['mouth_left'], 4, (0, 255, 0), -1)
-                    cv2.circle(frame, keypoints['mouth_right'], 4, (0, 255, 0), -1)
-                except Exception as e:
-                    print(f"Error processing face: {e}")
+            # Update the frame in the placeholder
+            frame_placeholder.image(frame, channels="BGR", use_container_width=True)
 
-        # Konversi frame ke RGB untuk Streamlit
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        stframe.image(frame_rgb, channels="RGB")
+        # Release webcam
+        cap.release()
+        cv2.destroyAllWindows()
 
-    # Lepaskan webcam setelah loop selesai
-    cap.release()
-    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    real_time_emotion_detection()

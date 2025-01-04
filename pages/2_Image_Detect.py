@@ -11,7 +11,7 @@ uploaded_file = st.file_uploader("Pilih foto dari penyimpanan perangkat Anda.", 
 
 if uploaded_file is not None:
     # Load model
-    model = load_model('deepid_60.keras')
+    model = load_model('deepid_model-2.keras')
 
     # Label emosi
     emotion_labels = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
@@ -42,7 +42,7 @@ if uploaded_file is not None:
         face_region = image_rgb[y:y2, x:x2]
 
         # Resize the face region to match the input shape of the model (e.g., 48x48 or 64x64)
-        face_region_resized = cv2.resize(face_region, (39, 31))  # Adjust size as per your model
+        face_region_resized = cv2.resize(face_region, (47, 55))  # Adjust size as per your model
         face_region_gray = cv2.cvtColor(face_region_resized, cv2.COLOR_RGB2GRAY)
         face_region_normalized = face_region_gray / 255.0  # Normalize pixel values
         face_region_input = np.expand_dims(face_region_normalized, axis=0)

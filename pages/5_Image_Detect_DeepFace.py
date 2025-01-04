@@ -35,3 +35,4 @@ if upload is not None:
         st.error("Gambar tidak dapat dibaca.")  
 else:  
     st.info("Silakan unggah gambar untuk mendeteksi emosi.")
+
